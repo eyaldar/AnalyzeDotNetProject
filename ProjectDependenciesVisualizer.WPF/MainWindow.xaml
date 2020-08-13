@@ -4,13 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:ProjectDependenciesVisualizer.Engine.Models;assembly=ProjectDependenciesVisualizer.Engine"
+        xmlns:local="clr-namespace:ProjectDependenciesVisualizer.WPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="boolToHiddenVisibilityConverter"
+                                            False="Hidden" True="Visible" />
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="6"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -49,5 +55,7 @@
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
         </TreeView>
+        <ProgressBar Height="6" Grid.Row="3" IsIndeterminate="True" Grid.ColumnSpan="3"
+                     Visibility="{Binding IsProcessing,Mode=OneWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolToHiddenVisibilityConverter}}" />
     </Grid>
 </Window>

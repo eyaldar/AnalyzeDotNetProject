@@ -54,6 +54,24 @@ namespace ProjectDependenciesVisualizer.WPF
             }
         }
 
+        private bool isProcessing;
+        public bool IsProcessing
+        {
+            get
+            {
+                return isProcessing;
+            }
+            set
+            {
+                if (isProcessing != value)
+                {
+                    isProcessing = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
         public MainWindowViewModel(IProjectsAnalyzer projectsAnalyzer)
         {
             this.projectsAnalyzer = projectsAnalyzer;
@@ -89,9 +107,20 @@ namespace ProjectDependenciesVisualizer.WPF
 
         private async void OnAnalyzeExecuted(object obj)
         {
-            IEnumerable<ProjectModel> projects = await Task.Run(() => projectsAnalyzer.Analyze(ProjectPath));
+            IsProcessing = true;
 
-            LoadData(projects);
+            try
+            {
+
+                IEnumerable<ProjectModel> projects = await Task.Run(() => projectsAnalyzer.Analyze(ProjectPath));
+
+                LoadData(projects);
+            }
+            catch {}
+            finally
+            {
+                IsProcessing = false;
+            }
         }
 
         private void LoadData(IEnumerable<ProjectModel> projects)
