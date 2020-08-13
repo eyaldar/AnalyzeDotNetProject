@@ -3,23 +3,29 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NuGet.ProjectModel;
+using ProjectDependenciesVisualizer.Engine.Interfaces;
 
-namespace AnalyzeDotNetProject
+namespace ProjectDependenciesVisualizer.Engine
 {
     /// <remarks>
     /// Credit for the stuff happening in here goes to the https://github.com/jaredcnance/dotnet-status project
     /// </remarks>
-    public class DependencyGraphService
+    public class DependencyGraphService : IDependencyGraphGenerator
     {
+        private readonly IRunner runner;
+
+        public DependencyGraphService(IRunner runner)
+        {
+            this.runner = runner;
+        }
+        
         public DependencyGraphSpec GenerateDependencyGraph(string projectPath)
         {
-            var dotNetRunner = new DotNetRunner();
-
             string dgOutput = Path.Combine(Path.GetTempPath(), Path.GetTempFileName());
                 
             string[] arguments = new[] {"msbuild", $"\"{projectPath}\"", "/t:GenerateRestoreGraphFile", $"/p:RestoreGraphOutputPath={dgOutput}"};
 
-            var runStatus = dotNetRunner.Run(Path.GetDirectoryName(projectPath), arguments);
+            var runStatus = runner.Run(Path.GetDirectoryName(projectPath), arguments);
 
             if (runStatus.IsSuccess)
             {

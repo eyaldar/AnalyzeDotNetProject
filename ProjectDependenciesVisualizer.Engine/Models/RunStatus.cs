@@ -1,4 +1,4 @@
-namespace AnalyzeDotNetProject
+namespace ProjectDependenciesVisualizer.Model
 {
     public class RunStatus
     {
