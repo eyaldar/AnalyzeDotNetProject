@@ -97,7 +97,12 @@ namespace ProjectDependenciesVisualizer.WPF
             Projects = new ObservableCollection<ProjectReferenceViewModel>();
             SearchCommand = new RelayCommand(AlwaysTrue, OnSearchExecuted);
             BrowseCommand = new RelayCommand(AlwaysTrue, OnBrowseExecuted);
-            AnalyzeCommand = new RelayCommand(AlwaysTrue, OnAnalyzeExecuted);
+            AnalyzeCommand = new RelayCommand(OnAnalyzeCanExecute, OnAnalyzeExecuted);
+        }
+
+        private bool OnAnalyzeCanExecute(object obj)
+        {
+            return !IsProcessing;
         }
 
         private void OnSearchExecuted(object obj)
