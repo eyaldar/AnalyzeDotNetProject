@@ -12,14 +12,23 @@ namespace ProjectDependenciesVisualizer.Engine
     {
         public FrameworkTargetModel Analyze(TargetFrameworkInformation targetFramework, LockFileTarget lockFileTarget)
         {
+            var references = new List<ReferenceModel>();
+
             foreach(var dependency in targetFramework.Dependencies)
             {
                 var projectLibrary = lockFileTarget.Libraries.FirstOrDefault(library => library.Name == dependency.Name);
 
-                IEnumerable<ReferenceModel> references = AnalyzeReferences(projectLibrary, lockFileTarget);
+                AddReference(lockFileTarget, references, projectLibrary);
             }
 
-            return null;
+            return new FrameworkTargetModel(targetFramework.FrameworkName.ToString(), references);
+        }
+
+        private void AddReference(LockFileTarget lockFileTarget, List<ReferenceModel> references, LockFileTargetLibrary projectLibrary)
+        {
+            IEnumerable<ReferenceModel> childReferences = AnalyzeReferences(projectLibrary, lockFileTarget);
+
+            references.Add(new ReferenceModel(projectLibrary.Name, projectLibrary.Version.ToString(), childReferences));
         }
 
         public IEnumerable<ReferenceModel> AnalyzeReferences(LockFileTargetLibrary projectLibrary, LockFileTarget lockFileTarget)
@@ -32,7 +41,7 @@ namespace ProjectDependenciesVisualizer.Engine
 
                 IEnumerable<ReferenceModel> childReferences = AnalyzeReferences(childLibrary, lockFileTarget);
 
-                references.Add(new ReferenceModel(childLibrary.Name, childLibrary.Version.ToString(), childReferences));
+                AddReference(lockFileTarget, references, childLibrary);
             }
 
             return references;

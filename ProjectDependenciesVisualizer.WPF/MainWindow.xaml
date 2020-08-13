@@ -1,0 +1,45 @@
+﻿<Window x:Class="ProjectDependenciesVisualizer.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:models="clr-namespace:ProjectDependenciesVisualizer.Engine.Models;assembly=ProjectDependenciesVisualizer.Engine"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <Button Content="Analyze" Command="{Binding AnalyzeCommand, Mode=OneTime}"/>
+        </StackPanel>
+        <TreeView Name="ProjectView" Grid.Row="1" ItemsSource="{Binding Projects, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type models:ProjectModel}" ItemsSource="{Binding Frameworks, Mode=OneTime}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Path=Name}" />
+                        <TextBlock Text=", " />
+                        <TextBlock Text="{Binding Path=Version}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type models:FrameworkTargetModel}" ItemsSource="{Binding References, Mode=OneTime}">
+                    <TextBlock Text="{Binding Path=Name}" />
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type models:ReferenceModel}" ItemsSource="{Binding Dependencies, Mode=OneTime}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Path=AssemblyName}" />
+                        <TextBlock Text=", " />
+                        <TextBlock Text="{Binding Path=Version}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+    </Grid>
+</Window>
