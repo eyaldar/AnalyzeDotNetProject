@@ -38,7 +38,9 @@
         <Button Content="Search" Command="{Binding SearchCommand, Mode=OneTime}"
                 Grid.Row="2" Grid.Column="2"/>
         <TreeView Name="ProjectView" Grid.Row="3" Grid.ColumnSpan="3"
-                  ItemsSource="{Binding Projects, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                  ItemsSource="{Binding Projects, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Standard">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="True" />
