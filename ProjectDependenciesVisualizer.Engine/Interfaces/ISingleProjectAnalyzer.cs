@@ -7,6 +7,6 @@ namespace ProjectDependenciesVisualizer.Engine.Interfaces
 {
     public interface ISingleProjectAnalyzer
     {
-        public ProjectModel Analyze(NuGet.ProjectModel.PackageSpec project);
+        public ProjectReferenceModel Analyze(NuGet.ProjectModel.PackageSpec project);
     }
 }

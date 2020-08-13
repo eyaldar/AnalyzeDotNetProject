@@ -5,6 +5,6 @@ namespace ProjectDependenciesVisualizer.Engine.Interfaces
 {
     public interface IProjectsAnalyzer
     {
-        IEnumerable<ProjectModel> Analyze(string projectFilePath);
+        IEnumerable<ProjectReferenceModel> Analyze(string projectFilePath);
     }
 }

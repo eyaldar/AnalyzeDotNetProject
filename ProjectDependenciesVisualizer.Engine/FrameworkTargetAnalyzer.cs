@@ -10,9 +10,9 @@ namespace ProjectDependenciesVisualizer.Engine
 {
     public class FrameworkTargetAnalyzer : IFrameworkTargetAnalyzer
     {
-        public FrameworkTargetModel Analyze(TargetFrameworkInformation targetFramework, LockFileTarget lockFileTarget)
+        public ProjectReferenceModel Analyze(TargetFrameworkInformation targetFramework, LockFileTarget lockFileTarget)
         {
-            var references = new List<ReferenceModel>();
+            var references = new List<ProjectReferenceModel>();
 
             foreach(var dependency in targetFramework.Dependencies)
             {
@@ -21,25 +21,25 @@ namespace ProjectDependenciesVisualizer.Engine
                 AddReference(lockFileTarget, references, projectLibrary);
             }
 
-            return new FrameworkTargetModel(targetFramework.FrameworkName.ToString(), references);
+            return new ProjectReferenceModel(targetFramework.FrameworkName.ToString(), string.Empty, references);
         }
 
-        private void AddReference(LockFileTarget lockFileTarget, List<ReferenceModel> references, LockFileTargetLibrary projectLibrary)
+        private void AddReference(LockFileTarget lockFileTarget, List<ProjectReferenceModel> references, LockFileTargetLibrary projectLibrary)
         {
-            IEnumerable<ReferenceModel> childReferences = AnalyzeReferences(projectLibrary, lockFileTarget);
+            IEnumerable<ProjectReferenceModel> childReferences = AnalyzeReferences(projectLibrary, lockFileTarget);
 
-            references.Add(new ReferenceModel(projectLibrary.Name, projectLibrary.Version.ToString(), childReferences));
+            references.Add(new ProjectReferenceModel(projectLibrary.Name, projectLibrary.Version.ToString(), childReferences));
         }
 
-        public IEnumerable<ReferenceModel> AnalyzeReferences(LockFileTargetLibrary projectLibrary, LockFileTarget lockFileTarget)
+        public IEnumerable<ProjectReferenceModel> AnalyzeReferences(LockFileTargetLibrary projectLibrary, LockFileTarget lockFileTarget)
         {
-            var references = new List<ReferenceModel>();
+            var references = new List<ProjectReferenceModel>();
 
             foreach (var childDependency in projectLibrary.Dependencies)
             {
                 var childLibrary = lockFileTarget.Libraries.FirstOrDefault(library => library.Name == childDependency.Id);
 
-                IEnumerable<ReferenceModel> childReferences = AnalyzeReferences(childLibrary, lockFileTarget);
+                IEnumerable<ProjectReferenceModel> childReferences = AnalyzeReferences(childLibrary, lockFileTarget);
 
                 AddReference(lockFileTarget, references, childLibrary);
             }

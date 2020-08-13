@@ -4,12 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:models="clr-namespace:ProjectDependenciesVisualizer.Engine.Models;assembly=ProjectDependenciesVisualizer.Engine"
-        xmlns:local="clr-namespace:ProjectDependenciesVisualizer.WPF"
+        xmlns:conv="clr-namespace:ProjectDependenciesVisualizer.WPF.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
-        <local:BoolToVisibilityConverter x:Key="boolToHiddenVisibilityConverter"
+        <conv:BoolToVisibilityConverter x:Key="boolToHiddenVisibilityConverter"
                                             False="Hidden" True="Visible" />
+        <conv:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -23,7 +24,8 @@
             <ColumnDefinition Width="2"/>
             <ColumnDefinition Width="60"/>
         </Grid.ColumnDefinitions>
-        <TextBox Text="{Binding ProjectPath, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Text="{Binding ProjectPath, UpdateSourceTrigger=PropertyChanged}"
+                 VerticalContentAlignment="Center"/>
         <Button Content="Browse..." Command="{Binding BrowseCommand, Mode=OneTime}"
                 Grid.Row="0" Grid.Column="2"/>
         <Button Content="Analyze" Command="{Binding AnalyzeCommand, Mode=OneTime}"
@@ -36,21 +38,11 @@
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type models:ProjectModel}" ItemsSource="{Binding Frameworks, Mode=OneTime}">
+                <HierarchicalDataTemplate DataType="{x:Type models:ProjectReferenceModel}" ItemsSource="{Binding Dependencies, Mode=OneTime}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Path=Name}" />
-                        <TextBlock Text=", " />
-                        <TextBlock Text="{Binding Path=Version}" />
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type models:FrameworkTargetModel}" ItemsSource="{Binding References, Mode=OneTime}">
-                    <TextBlock Text="{Binding Path=Name}" />
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type models:ReferenceModel}" ItemsSource="{Binding Dependencies, Mode=OneTime}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Path=AssemblyName}" />
-                        <TextBlock Text=", " />
-                        <TextBlock Text="{Binding Path=Version}" />
+                        <TextBlock Text=", " Visibility="{Binding Version, Converter={StaticResource EmptyStringToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding Path=Version}" Visibility="{Binding Version, Converter={StaticResource EmptyStringToVisibilityConverter}}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>

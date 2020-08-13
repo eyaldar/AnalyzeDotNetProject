@@ -19,16 +19,16 @@ namespace ProjectDependenciesVisualizer.Engine
             this.singleProjectAnalyzer = singleProjectAnalyzer;
         }
 
-        public IEnumerable<ProjectModel> Analyze(string projectFilePath)
+        public IEnumerable<ProjectReferenceModel> Analyze(string projectFilePath)
         {
-            List<ProjectModel> projects = new List<ProjectModel>();
+            List<ProjectReferenceModel> projects = new List<ProjectReferenceModel>();
             DependencyGraphSpec dependencyGraph = dependencyGraphGenerator.GenerateDependencyGraph(projectFilePath);
 
             foreach (PackageSpec project in GetPackageReferenceSupportedProjects(dependencyGraph))
             {
-                var projectModel = singleProjectAnalyzer.Analyze(project);
-                if(projectModel != null)
-                    projects.Add(projectModel);
+                var reference = singleProjectAnalyzer.Analyze(project);
+                if(reference != null)
+                    projects.Add(reference);
             }
 
             return projects;

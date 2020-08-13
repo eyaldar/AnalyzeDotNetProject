@@ -37,8 +37,8 @@ namespace ProjectDependenciesVisualizer.WPF
         }
 
 
-        private ObservableCollection<ProjectModel> projects;
-        public ObservableCollection<ProjectModel> Projects
+        private ObservableCollection<ProjectReferenceModel> projects;
+        public ObservableCollection<ProjectReferenceModel> Projects
         {
             get
             {
@@ -76,7 +76,7 @@ namespace ProjectDependenciesVisualizer.WPF
         {
             this.projectsAnalyzer = projectsAnalyzer;
 
-            Projects = new ObservableCollection<ProjectModel>();
+            Projects = new ObservableCollection<ProjectReferenceModel>();
             BrowseCommand = new RelayCommand(AlwaysTrue, OnBrowseExecuted);
             AnalyzeCommand = new RelayCommand(AlwaysTrue, OnAnalyzeExecuted);
         }
@@ -112,7 +112,7 @@ namespace ProjectDependenciesVisualizer.WPF
             try
             {
 
-                IEnumerable<ProjectModel> projects = await Task.Run(() => projectsAnalyzer.Analyze(ProjectPath));
+                IEnumerable<ProjectReferenceModel> projects = await Task.Run(() => projectsAnalyzer.Analyze(ProjectPath));
 
                 LoadData(projects);
             }
@@ -123,7 +123,7 @@ namespace ProjectDependenciesVisualizer.WPF
             }
         }
 
-        private void LoadData(IEnumerable<ProjectModel> projects)
+        private void LoadData(IEnumerable<ProjectReferenceModel> projects)
         {
             foreach (var project in projects)
             {

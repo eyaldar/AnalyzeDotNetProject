@@ -21,9 +21,9 @@ namespace ProjectDependenciesVisualizer.Engine
             this.frameworkTargetAnalyzer = frameworkTargetAnalyzer;
         }
 
-        public ProjectModel Analyze(PackageSpec project)
+        public ProjectReferenceModel Analyze(PackageSpec project)
         {
-            var frameworkModels = new List<FrameworkTargetModel>();
+            var frameworkModels = new List<ProjectReferenceModel>();
             LockFile lockFile = GetLockFile(project.FilePath, project.RestoreMetadata.OutputPath);
 
             foreach(TargetFrameworkInformation targetFramework in project.TargetFrameworks)
@@ -32,12 +32,12 @@ namespace ProjectDependenciesVisualizer.Engine
 
                 if(lockFileTargetFramework != null)
                 {
-                    var frameworkModel = frameworkTargetAnalyzer.Analyze(targetFramework, lockFileTargetFramework);
-                    frameworkModels.Add(frameworkModel);
+                    var framework = frameworkTargetAnalyzer.Analyze(targetFramework, lockFileTargetFramework);
+                    frameworkModels.Add(framework);
                 }
             }
 
-            return new ProjectModel(project.Name, project.Version.ToString(), frameworkModels);
+            return new ProjectReferenceModel(project.Name, project.Version.ToString(), frameworkModels);
         }
 
         private LockFile GetLockFile(string projectPath, string outputPath)

@@ -8,6 +8,6 @@ namespace ProjectDependenciesVisualizer.Engine.Interfaces
 {
     public interface IFrameworkTargetAnalyzer
     {
-        public FrameworkTargetModel Analyze(TargetFrameworkInformation targetFrameworkInformation, LockFileTarget lockFileTarget);
+        public ProjectReferenceModel Analyze(TargetFrameworkInformation targetFrameworkInformation, LockFileTarget lockFileTarget);
     }
 }
