@@ -3,17 +3,20 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:models="clr-namespace:ProjectDependenciesVisualizer.Engine.Models;assembly=ProjectDependenciesVisualizer.Engine"
+        xmlns:viewModels="clr-namespace:ProjectDependenciesVisualizer.WPF.ViewModels"
         xmlns:conv="clr-namespace:ProjectDependenciesVisualizer.WPF.Converters"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
-        <conv:BoolToVisibilityConverter x:Key="boolToHiddenVisibilityConverter"
+        <conv:BoolToVisibilityConverter x:Key="BoolToHiddenVisibilityConverter"
                                             False="Hidden" True="Visible" />
+        <conv:BoolToVisibilityConverter x:Key="BoolToCollapsedVisibilityConverter"
+                                            False="Collapsed" True="Visible" />
         <conv:EmptyStringToVisibilityConverter x:Key="EmptyStringToVisibilityConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
@@ -30,24 +33,29 @@
                 Grid.Row="0" Grid.Column="2"/>
         <Button Content="Analyze" Command="{Binding AnalyzeCommand, Mode=OneTime}"
                 Grid.Row="1" Grid.ColumnSpan="3"/>
-        <TreeView Name="ProjectView" Grid.Row="2" Grid.ColumnSpan="3"
+        <TextBox Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"
+                 VerticalContentAlignment="Center" Grid.Row="2"/>
+        <Button Content="Search" Command="{Binding SearchCommand, Mode=OneTime}"
+                Grid.Row="2" Grid.Column="2"/>
+        <TreeView Name="ProjectView" Grid.Row="3" Grid.ColumnSpan="3"
                   ItemsSource="{Binding Projects, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="True" />
+                    <Setter Property="Visibility" Value="{Binding MatchSearch, Converter={StaticResource BoolToCollapsedVisibilityConverter}}"/>
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type models:ProjectReferenceModel}" ItemsSource="{Binding Dependencies, Mode=OneTime}">
+                <HierarchicalDataTemplate DataType="{x:Type viewModels:ProjectReferenceViewModel}" ItemsSource="{Binding Dependencies, Mode=OneTime}">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Path=Name}" />
-                        <TextBlock Text=", " Visibility="{Binding Version, Converter={StaticResource EmptyStringToVisibilityConverter}}"/>
-                        <TextBlock Text="{Binding Path=Version}" Visibility="{Binding Version, Converter={StaticResource EmptyStringToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding Path=Data.Name}" />
+                        <TextBlock Text=", " Visibility="{Binding Data.Version, Converter={StaticResource EmptyStringToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding Path=Data.Version}" Visibility="{Binding Data.Version, Converter={StaticResource EmptyStringToVisibilityConverter}}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
         </TreeView>
-        <ProgressBar Height="6" Grid.Row="3" IsIndeterminate="True" Grid.ColumnSpan="3"
-                     Visibility="{Binding IsProcessing,Mode=OneWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource boolToHiddenVisibilityConverter}}" />
+        <ProgressBar Height="6" Grid.Row="4" IsIndeterminate="True" Grid.ColumnSpan="3"
+                     Visibility="{Binding IsProcessing,Mode=OneWay,UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolToHiddenVisibilityConverter}}" />
     </Grid>
 </Window>

@@ -9,6 +9,7 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using ProjectDependenciesVisualizer.Engine.Interfaces;
 using ProjectDependenciesVisualizer.Engine.Models;
+using ProjectDependenciesVisualizer.WPF.ViewModels;
 
 namespace ProjectDependenciesVisualizer.WPF
 {
@@ -16,6 +17,7 @@ namespace ProjectDependenciesVisualizer.WPF
     {
         private IProjectsAnalyzer projectsAnalyzer;
 
+        public ICommand SearchCommand { get; set; }
         public ICommand BrowseCommand { get; set; }
         public ICommand AnalyzeCommand { get; set; }
 
@@ -37,8 +39,8 @@ namespace ProjectDependenciesVisualizer.WPF
         }
 
 
-        private ObservableCollection<ProjectReferenceModel> projects;
-        public ObservableCollection<ProjectReferenceModel> Projects
+        private ObservableCollection<ProjectReferenceViewModel> projects;
+        public ObservableCollection<ProjectReferenceViewModel> Projects
         {
             get
             {
@@ -71,14 +73,51 @@ namespace ProjectDependenciesVisualizer.WPF
             }
         }
 
+        private string searchTerm;
+        public string SearchTerm
+        {
+            get
+            {
+                return searchTerm;
+            }
+            set
+            {
+                if (searchTerm != value)
+                {
+                    searchTerm = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public MainWindowViewModel(IProjectsAnalyzer projectsAnalyzer)
         {
             this.projectsAnalyzer = projectsAnalyzer;
 
-            Projects = new ObservableCollection<ProjectReferenceModel>();
+            Projects = new ObservableCollection<ProjectReferenceViewModel>();
+            SearchCommand = new RelayCommand(AlwaysTrue, OnSearchExecuted);
             BrowseCommand = new RelayCommand(AlwaysTrue, OnBrowseExecuted);
             AnalyzeCommand = new RelayCommand(AlwaysTrue, OnAnalyzeExecuted);
+        }
+
+        private void OnSearchExecuted(object obj)
+        {
+            foreach (var projectReference in Projects)
+            {
+                SearchReferencesByName(projectReference);
+            }
+        }
+
+        private void SearchReferencesByName(ProjectReferenceViewModel projectReference)
+        {
+            foreach (var dependency in projectReference.Dependencies)
+            {
+                SearchReferencesByName(dependency);
+            }
+
+            projectReference.MatchSearch = string.IsNullOrEmpty(SearchTerm)     || 
+                                           projectReference.ChildrenMatchSearch || 
+                                           projectReference.Data.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase);
         }
 
         private void OnBrowseExecuted(object obj)
@@ -127,8 +166,22 @@ namespace ProjectDependenciesVisualizer.WPF
         {
             foreach (var project in projects)
             {
-                Projects.Add(project);
+                ProjectReferenceViewModel viewModel = BuildProjectReferenceViewModel(project);
+                Projects.Add(viewModel);
             }
+        }
+
+        private ProjectReferenceViewModel BuildProjectReferenceViewModel(ProjectReferenceModel project)
+        {
+            var projectReferences = new List<ProjectReferenceViewModel>();
+
+            foreach (var dependency in project.Dependencies)
+            {
+                ProjectReferenceViewModel projectReference = BuildProjectReferenceViewModel(dependency);
+                projectReferences.Add(projectReference);
+            }
+
+            return new ProjectReferenceViewModel(project, projectReferences);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
