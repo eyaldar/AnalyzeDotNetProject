@@ -9,13 +9,21 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <StackPanel>
-            <Button Content="Analyze" Command="{Binding AnalyzeCommand, Mode=OneTime}"/>
-        </StackPanel>
-        <TreeView Name="ProjectView" Grid.Row="1" ItemsSource="{Binding Projects, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2"/>
+            <ColumnDefinition Width="60"/>
+        </Grid.ColumnDefinitions>
+        <TextBox Text="{Binding ProjectPath, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button Content="Browse..." Command="{Binding BrowseCommand, Mode=OneTime}"
+                Grid.Row="0" Grid.Column="2"/>
+        <Button Content="Analyze" Command="{Binding AnalyzeCommand, Mode=OneTime}"
+                Grid.Row="1" Grid.ColumnSpan="3"/>
+        <TreeView Name="ProjectView" Grid.Row="2" Grid.ColumnSpan="3"
+                  ItemsSource="{Binding Projects, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="True" />

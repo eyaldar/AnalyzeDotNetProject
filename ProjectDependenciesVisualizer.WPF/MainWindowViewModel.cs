@@ -16,49 +16,26 @@ namespace ProjectDependenciesVisualizer.WPF
     {
         private IProjectsAnalyzer projectsAnalyzer;
 
-        public MainWindowViewModel(IProjectsAnalyzer projectsAnalyzer)
-        {
-            this.projectsAnalyzer = projectsAnalyzer;
-
-            Projects = new ObservableCollection<ProjectModel>();
-            AnalyzeCommand = new RelayCommand(OnAnalyzeCanExecute, OnAnalyzeExecuted);
-        }
-
-        private async void OnAnalyzeExecuted(object obj)
-        {
-            var openDlg = new OpenFileDialog
-            {
-                Title = "Choose VS project or solution",
-                CheckFileExists = false,
-                CheckPathExists = false,
-                Filter = "solution or project files (*.sln, *.csproj)|*.sln;*.csproj",
-                Multiselect = false
-            };
-
-            var dialogResult = openDlg.ShowDialog();
-
-            if(dialogResult.HasValue && dialogResult.Value)
-            {
-                IEnumerable<ProjectModel> projects = await Task.Run(() => projectsAnalyzer.Analyze(openDlg.FileName));
-
-                LoadData(projects);
-            }
-        }
-
-        private void LoadData(IEnumerable<ProjectModel> projects)
-        {
-            foreach (var project in projects)
-            {
-                Projects.Add(project);
-            }
-        }
-
-        private bool OnAnalyzeCanExecute(object obj)
-        {
-            return true;
-        }
-
+        public ICommand BrowseCommand { get; set; }
         public ICommand AnalyzeCommand { get; set; }
+
+        private string projectPath;
+        public string ProjectPath
+        {
+            get
+            {
+                return projectPath;
+            }
+            set
+            {
+                if (projectPath != value)
+                {
+                    projectPath = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         private ObservableCollection<ProjectModel> projects;
         public ObservableCollection<ProjectModel> Projects
@@ -77,6 +54,53 @@ namespace ProjectDependenciesVisualizer.WPF
             }
         }
 
+        public MainWindowViewModel(IProjectsAnalyzer projectsAnalyzer)
+        {
+            this.projectsAnalyzer = projectsAnalyzer;
+
+            Projects = new ObservableCollection<ProjectModel>();
+            BrowseCommand = new RelayCommand(AlwaysTrue, OnBrowseExecuted);
+            AnalyzeCommand = new RelayCommand(AlwaysTrue, OnAnalyzeExecuted);
+        }
+
+        private void OnBrowseExecuted(object obj)
+        {
+            var openDlg = new OpenFileDialog
+            {
+                Title = "Choose VS project or solution",
+                CheckFileExists = false,
+                CheckPathExists = false,
+                Filter = "solution or project files (*.sln, *.csproj)|*.sln;*.csproj",
+                Multiselect = false
+            };
+
+            var dialogResult = openDlg.ShowDialog();
+
+            if(dialogResult.HasValue && dialogResult.Value)
+            {
+                ProjectPath = openDlg.FileName;
+            }
+        }
+
+        private bool AlwaysTrue(object obj)
+        {
+            return true;
+        }
+
+        private async void OnAnalyzeExecuted(object obj)
+        {
+            IEnumerable<ProjectModel> projects = await Task.Run(() => projectsAnalyzer.Analyze(ProjectPath));
+
+            LoadData(projects);
+        }
+
+        private void LoadData(IEnumerable<ProjectModel> projects)
+        {
+            foreach (var project in projects)
+            {
+                Projects.Add(project);
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
